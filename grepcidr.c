@@ -62,6 +62,7 @@ struct netspec
 {
 	unsigned int min;
 	unsigned int max;
+	char str[64];
 };
 
 /* IPv6 version of pattern */

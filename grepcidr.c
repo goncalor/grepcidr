@@ -270,6 +270,8 @@ int net_parse6(const char* line, struct netspec6* v6spec)
 	/* Simple IPv6 address is in address */
 	memcpy(v6spec->min, address, 16);
 	memcpy(v6spec->max, address, 16);
+	if (output_pattern)
+		strncpy(v6spec->str, line, sizeof(v6spec->str));
 	if (sscanf(line+field_len, "/%d", &maskbits) == 1)
 	{
 		unsigned char mask;
@@ -369,14 +371,19 @@ int match_ip(struct netspec* v4key, struct netspec6* v6key, char* line, const ch
 	int match = 0;
 	char* pattern = NULL;
 	struct netspec* net;
+	struct netspec6* net6;
 	seen_ip = 1;
 	if (v4key && (net = bsearch(v4key, array, patterns, sizeof(struct netspec), netsearch)))
 	{
 		match = 1;
 		pattern = net->str;
 	}
-	else if (v6key && bsearch(v6key, array6, patterns6, sizeof(struct netspec6), netsearch6))
+	else if (v6key &&
+			(net6 = bsearch(v6key, array6, patterns6, sizeof(struct netspec6), netsearch6)))
+	{
 		match = 1;
+		pattern = net6->str;
+	}
 	if (match)
 	{
 		match_one = 1;

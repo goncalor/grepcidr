@@ -342,7 +342,7 @@ int netsearch6(const void* a, const void* b)
 
 
 /* Action to take upon a matching line, print the line or count it */
-void print_or_count(char* line, const char* filename)
+void print_or_count(char* line, const char* filename, const char* pattern)
 {
 	anymatch = 1;
 	if (counting)
@@ -351,7 +351,10 @@ void print_or_count(char* line, const char* filename)
 	{
 		if (filename && shownames)
 			printf("%s:", filename);
-		printf("%s", line);
+		if (pattern && output_pattern)
+			printf("%s", pattern);
+		else
+			printf("%s", line);
 	}
 }
 
@@ -363,6 +366,7 @@ void print_or_count(char* line, const char* filename)
 int match_ip(struct netspec* v4key, struct netspec6* v6key, char* line, const char* filename)
 {
 	int match = 0;
+	char* pattern = NULL;
 	seen_ip = 1;
 	if (v4key && bsearch(v4key, array, patterns, sizeof(struct netspec), netsearch))
 		match = 1;
@@ -371,7 +375,7 @@ int match_ip(struct netspec* v4key, struct netspec6* v6key, char* line, const ch
 	if (match)
 	{
 		match_one = 1;
-		if (!invert) print_or_count(line, filename);	/* take action if not using -v */
+		if (!invert) print_or_count(line, filename, pattern);	/* take action if not using -v */
 	}
 	return match;
 }
@@ -542,6 +546,7 @@ int fgets_whole_line(char **bufptr, size_t *bufsize, FILE* stream)
 void search_stream(FILE* input_stream, const char* filename)
 {
 	char* line = NULL;
+	char* pattern = NULL;
 	size_t linesize = 0;
 	while (fgets_whole_line(&line, &linesize, input_stream))
 	{
@@ -571,7 +576,7 @@ void search_stream(FILE* input_stream, const char* filename)
 		
 		/* If using -i or -v, take action once the whole line has been processed */
 		if (invert && seen_ip && !match_one)
-			print_or_count(line, filename);
+			print_or_count(line, filename, pattern);
 	}
 	free(line);
 }

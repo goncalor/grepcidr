@@ -70,6 +70,7 @@ struct netspec6
 {
 	unsigned char min[16];
 	unsigned char max[16];
+	char str[128];
 };
 
 

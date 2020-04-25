@@ -194,6 +194,27 @@ void ipv6_increment(unsigned char* input, unsigned char* result)
 	}
 }
 
+/*
+*/
+unsigned log2_(unsigned int n)
+{
+    unsigned int val;
+    for (val = 0; n > 1; val++, n >>= 1);
+
+    return val;
+}
+
+
+/*
+
+*/
+char* netspec_to_ipv4(struct netspec* net, char *dst) {
+    struct sockaddr_in sa;
+    sa.sin_addr.s_addr = htonl(net->min);
+
+    return (char*) inet_ntop(AF_INET, &(sa.sin_addr), dst, INET_ADDRSTRLEN);
+}
+
 
 /*
 	Given string, fills in the struct netspec (must be allocated)
@@ -359,8 +380,14 @@ int match_ip(struct netspec* v4key, struct netspec6* v6key, char* line, const ch
 {
 	int match = 0;
 	seen_ip = 1;
-	if (v4key && bsearch(v4key, array, patterns, sizeof(struct netspec), netsearch))
-		match = 1;
+	char ip4[INET_ADDRSTRLEN];
+	struct netspec* net = bsearch(v4key, array, patterns, sizeof(struct netspec), netsearch);
+	if (v4key && net)
+	{
+	    printf("%d\n", net->max - net->min);
+	    printf("net %s/%d\n", netspec_to_ipv4(net, ip4), 32 - log2_(net->max - net->min + 1));
+	    match = 1;
+	}
 	else if (v6key && bsearch(v6key, array6, patterns6, sizeof(struct netspec6), netsearch6))
 		match = 1;
 	if (match)

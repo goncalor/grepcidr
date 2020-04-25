@@ -384,9 +384,8 @@ int match_ip(struct netspec* v4key, struct netspec6* v6key, char* line, const ch
 	struct netspec* net = bsearch(v4key, array, patterns, sizeof(struct netspec), netsearch);
 	if (v4key && net)
 	{
-	    printf("%d\n", net->max - net->min);
-	    printf("net %s/%d\n", netspec_to_ipv4(net, ip4), 32 - log2_(net->max - net->min + 1));
-	    match = 1;
+	    printf("%s/%d\n", netspec_to_ipv4(net, ip4), 32 - log2_(net->max - net->min + 1));
+	    return 1;
 	}
 	else if (v6key && bsearch(v6key, array6, patterns6, sizeof(struct netspec6), netsearch6))
 		match = 1;

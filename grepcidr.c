@@ -39,8 +39,8 @@
 
 #define TXT_VERSION	"grepcidr 2.0\nCopyright (C) 2004 - 2014  Jem E. Berkes <jem@berkes.ca>\n"
 #define TXT_USAGE	"Usage:\n" \
-			"\tgrepcidr [-V] [-cisvx] PATTERN [FILE...]\n" \
-			"\tgrepcidr [-V] [-cisvx] [-e PATTERN | -f PATFILE] [FILE...]\n"
+			"\tgrepcidr [-V] [-cipsvx] PATTERN [FILE...]\n" \
+			"\tgrepcidr [-V] [-cipsvx] [-e PATTERN | -f PATFILE] [FILE...]\n"
 #define TXT_USAGE2	"grepcidr: Specify PATTERN or -f FILE to read patterns from\n"
 #define TXT_BADPAT	"grepcidr: Not a valid pattern"
 #define TXT_FATAL	"grepcidr: Fatal error: unexpected size of data type(s) on this system!\n"

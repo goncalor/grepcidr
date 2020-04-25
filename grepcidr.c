@@ -101,6 +101,7 @@ unsigned int counting = 0;		/* when non-zero, counts matches */
 int include_noip = 0;			/* flag to include lines without IPs when inverting */
 int strict_align = 0;			/* flag to enforce strict base alignment */
 int strict_nosearch = 0;			/* flag for original style, single IP match */
+int output_pattern = 0;			/* flag to output maching pattern */
 int match_one = 0;				/* for -v, have matched one IP on this line */
 int seen_ip = 0;				/* for -v, have seen an IP on this line */
 int shownames = 0;				/* show file names with output lines */
@@ -576,7 +577,7 @@ void search_stream(FILE* input_stream, const char* filename)
 
 int main(int argc, char* argv[])
 {
-	static char shortopts[] = "ce:f:isvxV";
+	static char shortopts[] = "ce:f:ipsvxV";
 	char* pat_filename = NULL;		/* filename containing patterns */
 	char* pat_strings = NULL;		/* pattern strings on command line */
 	int foundopt;
@@ -628,6 +629,10 @@ int main(int argc, char* argv[])
 				pat_filename = optarg;
 				break;
 				
+			case 'p':
+				output_pattern = 1;
+				break;
+
 			default:
 				fprintf(stderr, TXT_USAGE);
 				return EXIT_ERROR;

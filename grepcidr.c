@@ -367,9 +367,13 @@ int match_ip(struct netspec* v4key, struct netspec6* v6key, char* line, const ch
 {
 	int match = 0;
 	char* pattern = NULL;
+	struct netspec* net;
 	seen_ip = 1;
-	if (v4key && bsearch(v4key, array, patterns, sizeof(struct netspec), netsearch))
+	if (v4key && (net = bsearch(v4key, array, patterns, sizeof(struct netspec), netsearch)))
+	{
 		match = 1;
+		pattern = net->str;
+	}
 	else if (v6key && bsearch(v6key, array6, patterns6, sizeof(struct netspec6), netsearch6))
 		match = 1;
 	if (match)

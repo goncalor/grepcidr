@@ -40,6 +40,7 @@ COMMAND USAGE
 -x	Strict matching, only look at start of line
 -e	Specify individual IP or CIDR pattern(s) on command-line
 -f	Load individual IP or CIDR pattern(s) from file
+-p	Output the pattern that matches a line, not the line itself
 
 
 MAJOR 2.0 CHANGES

@@ -99,6 +99,12 @@
           <para>Load individual IP or CIDR pattern(s) from file</para>
         </listitem>
       </varlistentry>
+      <varlistentry>
+        <term><option>-p</option></term>
+        <listitem>
+          <para>Output the pattern that matches a line, not the line itself</para>
+        </listitem>
+      </varlistentry>
     </variablelist>
   </refsect1>
   

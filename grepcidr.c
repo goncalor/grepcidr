@@ -42,6 +42,7 @@
 			"\tgrepcidr [-V] [-cipsvx] PATTERN [FILE...]\n" \
 			"\tgrepcidr [-V] [-cipsvx] [-e PATTERN | -f PATFILE] [FILE...]\n"
 #define TXT_USAGE2	"grepcidr: Specify PATTERN or -f FILE to read patterns from\n"
+#define TXT_USAGE3	"grepcidr: -p cannot be used with -v or -i\n"
 #define TXT_BADPAT	"grepcidr: Not a valid pattern"
 #define TXT_FATAL	"grepcidr: Fatal error: unexpected size of data type(s) on this system!\n"
 #define TXT_MEMORY	"grepcidr: Fatal error: out of memory!\n"
@@ -668,6 +669,11 @@ int main(int argc, char* argv[])
 			fprintf(stderr, TXT_USAGE2);
 			return EXIT_ERROR;
 		}
+	}
+	if (invert && output_pattern)
+	{
+		fprintf(stderr, TXT_USAGE3);
+		return EXIT_ERROR;
 	}
 
 	/* Initial array allocation */

@@ -207,6 +207,9 @@ int net_parse(const char* line, struct netspec* spec)
 	unsigned int IP1[4], IP2[4];
 	int maskbits = 32;	/* if using CIDR IP/mask format */
 	
+	if (output_pattern)
+		strncpy(spec->str, line, sizeof(spec->str));
+
 	/* Try parsing IP/mask, CIDR format */
 	if (strchr(line, '/') && (sscanf(line, "%u.%u.%u.%u/%d", &IP1[0], &IP1[1], &IP1[2], &IP1[3], &maskbits) == 5)
 		&& VALID_IP(IP1))

@@ -205,6 +205,9 @@ void ipv6_increment(unsigned char* input, unsigned char* result)
 */
 char* store_pattern(const char* line)
 {
+	if (!line)
+		return NULL;
+
 	char* new = strdup(line);
 	if (new == NULL)
 	{
@@ -225,7 +228,6 @@ int net_parse(const char* line, struct netspec* spec)
 	unsigned int IP1[4], IP2[4];
 	int maskbits = 32;	/* if using CIDR IP/mask format */
 	
-	spec->str = (output_pattern ? store_pattern(line) : NULL);
 	/* Try parsing IP/mask, CIDR format */
 	if (strchr(line, '/') && (sscanf(line, "%u.%u.%u.%u/%d", &IP1[0], &IP1[1], &IP1[2], &IP1[3], &maskbits) == 5)
 		&& VALID_IP(IP1))
@@ -285,7 +287,6 @@ int net_parse6(const char* line, struct netspec6* v6spec)
 	/* Simple IPv6 address is in address */
 	memcpy(v6spec->min, address, 16);
 	memcpy(v6spec->max, address, 16);
-	v6spec->str = (output_pattern ? store_pattern(line) : NULL);
 	if (sscanf(line+field_len, "/%d", &maskbits) == 1)
 	{
 		unsigned char mask;
@@ -423,9 +424,15 @@ void load_patterns(const char* pat_filename, char* pat_strings)
 				if ((*line=='#')||(*line=='\n')||(*line=='\r'))
 					continue;	/* skip blank lines and comments */
 				if (net_parse(line, &ipv4_pat))
+				{
+					ipv4_pat.str = (output_pattern ? store_pattern(line) : NULL);
 					array_insert(&ipv4_pat);
+				}
 				else if (net_parse6(line, &ipv6_pat))
+				{
+					ipv6_pat.str = (output_pattern ? store_pattern(line) : NULL);
 					array_insert6(&ipv6_pat);
+				}
 				else
 					fprintf(stderr, TXT_BADPAT ": %s", line);
 			}
@@ -463,7 +470,11 @@ void load_patterns(const char* pat_filename, char* pat_strings)
 		for (item=1; item<patterns; item++)
 		{
 			if (array[item].max <= array[item-1].max)
+			{
+				free(array[item].str);
 				array[item] = array[item-1];
+				array[item].str = store_pattern(array[item-1].str);
+			}
 			else if (array[item].min <= array[item-1].max)
 				array[item].min = array[item-1].max + 1;	/* overflow possibility */
 		}
@@ -476,7 +487,11 @@ void load_patterns(const char* pat_filename, char* pat_strings)
 		for (item=1; item<patterns6; item++)
 		{
 			if (memcmp(array6[item].max, array6[item-1].max, 16) <= 0)
+			{
+				free(array6[item].str);
 				array6[item] = array6[item-1];
+				array6[item].str = store_pattern(array6[item-1].str);
+			}
 			else if (memcmp(array6[item].min, array6[item-1].max, 16) <= 0)
 				ipv6_increment(array6[item-1].max, array6[item].min);
 		}
@@ -727,11 +742,20 @@ int main(int argc, char* argv[])
 	
 	if (counting)
 		printf("%u\n", counting-1);
+	unsigned int i;
 	/* Cleanup */
 	if (array)
+	{
+		for (i=0; i<patterns; i++)
+			free(array[i].str);
 		free(array);
+	}
 	if (array6)
+	{
+		for (i=0; i<patterns6; i++)
+			free(array6[i].str);
 		free(array6);
+	}
 	if (anymatch)
 		return EXIT_OK;
 	else

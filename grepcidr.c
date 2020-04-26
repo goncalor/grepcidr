@@ -63,7 +63,7 @@ struct netspec
 {
 	unsigned int min;
 	unsigned int max;
-	char str[64];
+	char* str;
 };
 
 /* IPv6 version of pattern */
@@ -71,7 +71,7 @@ struct netspec6
 {
 	unsigned char min[16];
 	unsigned char max[16];
-	char str[128];
+	char* str;
 };
 
 
@@ -200,6 +200,22 @@ void ipv6_increment(unsigned char* input, unsigned char* result)
 
 
 /*
+	Given a string, duplicates that string to a new buffer.
+	Returns a pointer to the new string.
+*/
+char* store_pattern(const char* line)
+{
+	char* new = strdup(line);
+	if (new == NULL)
+	{
+		fprintf(stderr, TXT_MEMORY);
+		exit(EXIT_ERROR);
+	}
+	return new;
+}
+
+
+/*
 	Given string, fills in the struct netspec (must be allocated)
 	Accept CIDR IP/mask format or IP_start-IP_end range.
 	Returns true (nonzero) on success, false (zero) on failure.
@@ -209,9 +225,7 @@ int net_parse(const char* line, struct netspec* spec)
 	unsigned int IP1[4], IP2[4];
 	int maskbits = 32;	/* if using CIDR IP/mask format */
 	
-	if (output_pattern)
-		strncpy(spec->str, line, sizeof(spec->str));
-
+	spec->str = (output_pattern ? store_pattern(line) : NULL);
 	/* Try parsing IP/mask, CIDR format */
 	if (strchr(line, '/') && (sscanf(line, "%u.%u.%u.%u/%d", &IP1[0], &IP1[1], &IP1[2], &IP1[3], &maskbits) == 5)
 		&& VALID_IP(IP1))
@@ -271,8 +285,7 @@ int net_parse6(const char* line, struct netspec6* v6spec)
 	/* Simple IPv6 address is in address */
 	memcpy(v6spec->min, address, 16);
 	memcpy(v6spec->max, address, 16);
-	if (output_pattern)
-		strncpy(v6spec->str, line, sizeof(v6spec->str));
+	v6spec->str = (output_pattern ? store_pattern(line) : NULL);
 	if (sscanf(line+field_len, "/%d", &maskbits) == 1)
 	{
 		unsigned char mask;

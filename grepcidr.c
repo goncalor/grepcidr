@@ -29,7 +29,6 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/types.h>
-#include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
@@ -452,9 +451,15 @@ void load_patterns(const char* pat_filename, char* pat_strings)
 			struct netspec ipv4_pat;
 			struct netspec6 ipv6_pat;
 			if (net_parse(token, &ipv4_pat))
+			{
+				ipv4_pat.str = (output_pattern ? store_pattern(token) : NULL);
 				array_insert(&ipv4_pat);
+			}
 			else if (net_parse6(token, &ipv6_pat))
+			{
+				ipv6_pat.str = (output_pattern ? store_pattern(token) : NULL);
 				array_insert6(&ipv6_pat);
+			}
 			else
 				fprintf(stderr, TXT_BADPAT ": %s\n", token);
 			token = strtok(NULL, TOKEN_SEPS);

@@ -450,9 +450,10 @@ void load_patterns(const char* pat_filename, char* pat_strings)
 		{
 			struct netspec ipv4_pat;
 			struct netspec6 ipv6_pat;
-			char pattern[strlen(token)+2]; // +2 for "\n\0"
+			char sep[] = "\n";
+			char pattern[strlen(token)+sizeof(sep)+1]; // +1 for "\0"
 			strcpy(pattern, token);
-			strncat(pattern, "\n", 2);
+			strcat(pattern, sep);
 			if (net_parse(token, &ipv4_pat))
 			{
 				ipv4_pat.str = (output_pattern ? store_pattern(pattern) : NULL);
